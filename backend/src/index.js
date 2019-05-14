@@ -1,10 +1,9 @@
 const dotenv = require('dotenv');
 const Koa = require('koa');
-const Router = require('koa-router');
 
 const firebase = require('./firebase');
-
-const projects = require('./koa/projects');
+const globals = require('./globals');
+const koa = require('./koa');
 
 const main = async env => {
   const {db} = await firebase();
@@ -12,22 +11,9 @@ const main = async env => {
   const app = new Koa();
 
   app.context.db = db;
+  app.context.globals = globals;
 
-  const router = new Router();
-
-  const projectsRouter = new Router();
-  projects(env, projectsRouter);
-  router.use(
-    '/projects',
-    projectsRouter.routes(),
-    projectsRouter.allowedMethods(),
-  );
-
-  app.use(router.routes(), router.allowedMethods());
-
-  app.use(async (ctx, next) => {
-    ctx.body;
-  });
+  koa(env, app);
 
   app.listen(env.PORT);
 };
