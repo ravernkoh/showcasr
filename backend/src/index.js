@@ -25,6 +25,10 @@ const main = async env => {
 
   app.use(router.routes(), router.allowedMethods());
 
+  app.use(async (ctx, next) => {
+    ctx.body;
+  });
+
   app.listen(env.PORT);
 };
 
