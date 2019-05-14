@@ -1,0 +1,17 @@
+{
+  "name": "showcasr-backend",
+  "private": true,
+  "scripts": {
+    "start:dev": "nodemon src/index.js"
+  },
+  "author": "Ravern Koh",
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  },
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "firebase-admin": "^7.3.0",
+    "koa": "^2.7.0",
+    "koa-router": "^7.4.0"
+  }
+}
