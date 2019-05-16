@@ -8,9 +8,11 @@ class Display extends Component {
 
     this.state = {
       ws: null,
+      project: null,
     };
 
     this.onWebSocketMessage = this.onWebSocketMessage.bind(this);
+    this.renderProject = this.renderProject.bind(this);
   }
 
   componentDidMount() {
@@ -24,11 +26,22 @@ class Display extends Component {
   }
 
   onWebSocketMessage(e) {
-    console.log(JSON.parse(e.data, JSON.dateParser));
+    const project = JSON.parse(e.data, JSON.dateParser);
+    this.setState({project});
   }
 
   render() {
-    return <p>Hello, world!</p>;
+    if (this.state.project) {
+      return this.renderProject();
+    } else {
+      return <div>Empty!</div>;
+    }
+  }
+
+  renderProject() {
+    return (
+      <img src={this.state.project.image} alt={this.state.project.title} />
+    );
   }
 }
 
