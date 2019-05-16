@@ -1,8 +1,16 @@
+const uuid = require('uuid/v4');
+
 // Get live updates of which project to display.
 const get = async ctx => {
   if (ctx.ws) {
+    const id = uuid();
+
     const ws = await ctx.ws();
-    ctx.core.addClient({ws});
+    ws.on('close', () => {
+      ctx.core.removeClient(id);
+    });
+
+    ctx.core.addClient({id, ws});
   }
   ctx.status = 500;
   ctx.body = {message: 'Could not start websocket connection'};

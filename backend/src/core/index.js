@@ -26,8 +26,16 @@ const addClient = core => client => {
     return;
   }
   client.project = project;
-  if (client.ws.readyState === 1) {
-    client.ws.send(JSON.stringify(client.project));
+  client.ws.send(JSON.stringify(client.project));
+};
+
+// Removes the client with the given id.
+const removeClient = core => id => {
+  for (let i = 0; i < core.clients.length; i++) {
+    if (core.clients[i].id === id) {
+      core.clients.splice(i, 1);
+      break;
+    }
   }
 };
 
@@ -39,9 +47,7 @@ const rotateClients = core => () => {
       continue;
     }
     client.project = project;
-    if (client.ws.readyState === 1) {
-      client.ws.send(JSON.stringify(client.project));
-    }
+    client.ws.send(JSON.stringify(client.project));
   }
 };
 
@@ -62,6 +68,7 @@ module.exports = ({interval}) => {
   core.startDisplay = startDisplay(core);
   core.stopDisplay = stopDisplay(core);
   core.addClient = addClient(core);
+  core.removeClient = removeClient(core);
   core.rotateClients = rotateClients(core);
   core.setProjects = setProjects(core);
 
