@@ -13,6 +13,12 @@ const main = async env => {
   app.context.db = db;
   app.context.globals = globals;
 
+  setInterval(() => {
+    for (const client of globals.clients) {
+      client.ws.send('Boo!');
+    }
+  }, 1000);
+
   koa(env, app);
 
   app.listen(env.PORT);

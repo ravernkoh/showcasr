@@ -1,6 +1,6 @@
 const globals = {
-  selectedProjects: [],
-  websocketClients: [],
+  projects: [],
+  clients: [],
 };
 
 module.exports = globals;
