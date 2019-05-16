@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const bodyParser = require('koa-bodyparser');
 const websocket = require('koa-easy-ws');
 
 const projects = require('./projects');
@@ -19,6 +20,7 @@ const buildLiveRouter = env => {
 const buildRouter = env => {
   const router = new Router();
 
+  router.use(bodyParser());
   router.use(websocket());
 
   const projectsRouter = buildProjectsRouter(env);

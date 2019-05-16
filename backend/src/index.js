@@ -2,8 +2,9 @@ const dotenv = require('dotenv');
 const Koa = require('koa');
 
 const firebase = require('./firebase');
-const globals = require('./globals');
+const core = require('./core');
 const koa = require('./koa');
+const util = require('./util');
 
 const main = async env => {
   const {db} = await firebase();
@@ -11,13 +12,9 @@ const main = async env => {
   const app = new Koa();
 
   app.context.db = db;
-  app.context.globals = globals;
+  app.context.core = core({interval: 1000});
 
-  setInterval(() => {
-    for (const client of globals.clients) {
-      client.ws.send('Boo!');
-    }
-  }, 1000);
+  app.context.core.startDisplay();
 
   koa(env, app);
 
