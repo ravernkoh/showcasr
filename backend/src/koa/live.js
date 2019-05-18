@@ -18,7 +18,17 @@ const get = async ctx => {
 
 // Configure the current projects.
 const post = async ctx => {
-  ctx.core.setProjects(await ctx.db.projects.all());
+  const query = ctx.query;
+  if (query.tags) {
+    query.tags = query.tags.split(',').map(tag => tag.trim());
+  }
+  if (query.course) {
+    query.course = query.course.split(',').map(course => course.trim());
+  }
+
+  const projects = await ctx.db.projects.all(query);
+  ctx.core.setProjects(projects);
+
   ctx.body = {message: 'Success!'};
 };
 
