@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
+const CORS = require('koa2-cors');
 const websocket = require('koa-easy-ws');
 
 const projects = require('./projects');
@@ -20,8 +21,18 @@ const buildLiveRouter = env => {
 const buildRouter = env => {
   const router = new Router();
 
+  router.use(
+    CORS({
+      origin: '*',
+    }),
+  );
   router.use(bodyParser());
   router.use(websocket());
+
+  // In order to satisfy CORS.
+  router.options('*', (ctx, next) => {
+    ctx.status = 200;
+  });
 
   const projectsRouter = buildProjectsRouter(env);
   router.use(

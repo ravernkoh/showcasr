@@ -1,4 +1,6 @@
-import React, {Component} from 'react';
+import React, {Fragment, Component} from 'react';
+
+import Config from './Config';
 
 import './Display.css';
 
@@ -31,11 +33,12 @@ class Display extends Component {
   }
 
   render() {
-    if (this.state.project) {
-      return this.renderProject();
-    } else {
-      return <div>Empty!</div>;
-    }
+    return (
+      <Fragment>
+        <Config />
+        {this.state.project ? this.renderProject() : 'Empty!'}
+      </Fragment>
+    );
   }
 
   renderProject() {
