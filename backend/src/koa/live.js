@@ -18,7 +18,7 @@ const get = async ctx => {
 
 // Configure the current projects.
 const post = async ctx => {
-  const query = ctx.query;
+  const query = ctx.request.body;
   if (query.tags) {
     query.tags = query.tags.split(',').map(tag => tag.trim());
   }

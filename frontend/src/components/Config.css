@@ -1,0 +1,44 @@
+.Config-main {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+.Config-main input {
+  font-size: 16px;
+}
+
+.Config-main button {
+  font-size: 16px;
+}
+
+.Config-main-expanded {
+  background-color: #eee;
+  width: 480px;
+  margin-bottom: 5px;
+  border: solid 1px #ddd;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.Config-toggle {
+  text-align: right;
+}
+
+.Config-form-group {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.Config-form-group label {
+  width: 100px;
+}
+
+.Config-form-group input {
+  flex-grow: 1;
+}
+
+.Config-form-submit-button {
+  margin-top: 10px;
+}
