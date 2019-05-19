@@ -10,14 +10,12 @@ const live = require('./live');
 
 const buildProjectsRouter = env => {
   const router = new Router();
-  router.all('*', auth());
   projects(env, router);
   return router;
 };
 
 const buildLiveRouter = env => {
   const router = new Router();
-  router.all('*', auth());
   live(env, router);
   return router;
 };
@@ -33,6 +31,7 @@ const buildRouter = env => {
   router.use(bodyParser());
   router.use(bearerToken());
   router.use(websocket());
+  router.use(auth());
 
   // In order to satisfy CORS.
   router.options('*', (ctx, next) => {
