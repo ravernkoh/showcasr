@@ -48,6 +48,7 @@ class Login extends Component {
   render() {
     return (
       <div className="Login-main">
+        <h2>Showcasr</h2>
         <form className="Login-form" onSubmit={this.onSubmitButtonPressed}>
           <div className="Login-form-group">
             <input
