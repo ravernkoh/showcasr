@@ -1,0 +1,10 @@
+.Display-project {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Display-project-image {
+  height: 100%;
+}

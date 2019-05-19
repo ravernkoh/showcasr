@@ -4,6 +4,9 @@ import Config from './Config';
 
 import './Display.css';
 
+const ACTION_UPDATE = 'UPDATE';
+const ACTION_CLEAR = 'CLEAR';
+
 class Display extends Component {
   constructor(props) {
     super(props);
@@ -28,8 +31,19 @@ class Display extends Component {
   }
 
   onWebSocketMessage(e) {
-    const project = JSON.parse(e.data, JSON.dateParser);
-    this.setState({project});
+    const message = JSON.parse(e.data, JSON.dateParser);
+
+    switch (message.action) {
+      case ACTION_UPDATE:
+        const project = message.data;
+        this.setState({project});
+        break;
+      case ACTION_CLEAR:
+        this.setState({project: null});
+        break;
+      default:
+        break;
+    }
   }
 
   render() {
@@ -43,7 +57,13 @@ class Display extends Component {
 
   renderProject() {
     return (
-      <img src={this.state.project.image} alt={this.state.project.title} />
+      <div className="Display-project">
+        <img
+          className="Display-project-image"
+          src={this.state.project.image}
+          alt={this.state.project.title}
+        />
+      </div>
     );
   }
 }

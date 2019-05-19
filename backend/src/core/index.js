@@ -2,6 +2,9 @@ const queue = require('./queue');
 
 const core = {};
 
+const ACTION_UPDATE = 'UPDATE';
+const ACTION_CLEAR = 'CLEAR';
+
 // Stops any existing displays and starts a new display loop.
 const startDisplay = core => () => {
   core.stopDisplay();
@@ -26,7 +29,12 @@ const addClient = core => client => {
     return;
   }
   client.project = project;
-  client.ws.send(JSON.stringify(client.project));
+  client.ws.send(
+    JSON.stringify({
+      action: ACTION_UPDATE,
+      data: client.project,
+    }),
+  );
 };
 
 // Removes the client with the given id.
@@ -44,10 +52,20 @@ const rotateClients = core => () => {
   for (const client of core.clients) {
     const project = core.projects.rotate();
     if (!project) {
+      client.ws.send(
+        JSON.stringify({
+          action: ACTION_CLEAR,
+        }),
+      );
       continue;
     }
     client.project = project;
-    client.ws.send(JSON.stringify(client.project));
+    client.ws.send(
+      JSON.stringify({
+        action: ACTION_UPDATE,
+        data: client.project,
+      }),
+    );
   }
 };
 
