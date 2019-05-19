@@ -1,5 +1,6 @@
-import axios from 'axios';
 import React, {Component} from 'react';
+
+import axios from '../axios';
 
 import './Config.css';
 
@@ -12,12 +13,16 @@ class Config extends Component {
       form: {
         title: '',
         description: '',
+        tags: [],
+        course: [],
       },
     };
 
     this.onToggleButtonPressed = this.onToggleButtonPressed.bind(this);
     this.onTitleInputChanged = this.onTitleInputChanged.bind(this);
     this.onDescriptionInputChanged = this.onDescriptionInputChanged.bind(this);
+    this.onTagsInputChanged = this.onTagsInputChanged.bind(this);
+    this.onCourseInputChanged = this.onCourseInputChanged.bind(this);
     this.onSubmitButtonPressed = this.onSubmitButtonPressed.bind(this);
 
     this.renderExpanded = this.renderExpanded.bind(this);
@@ -39,11 +44,23 @@ class Config extends Component {
     this.setState({form});
   }
 
+  onTagsInputChanged(event) {
+    const form = this.state.form;
+    form.tags = event.target.value.split(',').map(tag => tag.trim());
+    this.setState({form});
+  }
+
+  onCourseInputChanged(event) {
+    const form = this.state.form;
+    form.course = event.target.value.split(',').map(course => course.trim());
+    this.setState({form});
+  }
+
   onSubmitButtonPressed(event) {
     event.preventDefault();
 
     axios
-      .post('http://localhost:4321/live', this.state.form)
+      .post('/live', this.state.form)
       .then(res => res.data)
       .then(console.log)
       .catch(console.error);
@@ -84,6 +101,24 @@ class Config extends Component {
               value={this.state.form.description}
               onChange={this.onDescriptionInputChanged}
               name="description"
+            />
+          </div>
+          <div className="Config-form-group">
+            <label htmlFor="tags">Tags</label>
+            <input
+              type="text"
+              value={this.state.form.tags.join(', ')}
+              onChange={this.onTagsInputChanged}
+              name="tags"
+            />
+          </div>
+          <div className="Config-form-group">
+            <label htmlFor="course">Course</label>
+            <input
+              type="text"
+              value={this.state.form.course.join(', ')}
+              onChange={this.onCourseInputChanged}
+              name="course"
             />
           </div>
           <div className="Config-form-group">
