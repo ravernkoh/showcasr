@@ -1,9 +1,24 @@
+const firebase = require('firebase-admin');
 const uuid = require('uuid/v4');
 
 const auth = require('./auth');
 
 // Get live updates of which project to display.
 const get = async ctx => {
+  if (!ctx.query.token) {
+    // TODO: Handle error properly.
+    ctx.status = 401;
+    return;
+  }
+
+  try {
+    await firebase.auth().verifyIdToken(ctx.query.token, true);
+  } catch (error) {
+    // TODO: Handle error properly.
+    ctx.status = 401;
+    return;
+  }
+
   if (ctx.ws) {
     const id = uuid();
 
@@ -31,5 +46,5 @@ const post = async ctx => {
 
 module.exports = (env, router) => {
   router.get('/', get);
-  router.post('/', post);
+  router.post('/', auth(), post);
 };

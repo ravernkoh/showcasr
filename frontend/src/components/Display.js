@@ -1,5 +1,7 @@
 import React, {Fragment, Component} from 'react';
 
+import firebase from 'firebase/app';
+
 import Config from './Config';
 
 import './Display.css';
@@ -21,9 +23,17 @@ class Display extends Component {
   }
 
   componentDidMount() {
-    const ws = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
-    ws.onmessage = this.onWebSocketMessage;
-    this.setState({ws});
+    firebase
+      .auth()
+      .currentUser.getIdToken()
+      .then(idToken => {
+        const ws = new WebSocket(
+          `${process.env.REACT_APP_WEBSOCKET_URL}?token=${idToken}`,
+        );
+        ws.onmessage = this.onWebSocketMessage;
+        this.setState({ws});
+      })
+      .catch(console.error);
   }
 
   componentWillUnmount() {
