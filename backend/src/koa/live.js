@@ -1,5 +1,7 @@
 const uuid = require('uuid/v4');
 
+const auth = require('./auth');
+
 // Get live updates of which project to display.
 const get = async ctx => {
   if (ctx.ws) {
@@ -20,6 +22,7 @@ const get = async ctx => {
 const post = async ctx => {
   const query = ctx.request.body;
 
+  // TODO: Handle error properly.
   const projects = await ctx.db.projects.all(query);
   ctx.core.setProjects(projects);
 
