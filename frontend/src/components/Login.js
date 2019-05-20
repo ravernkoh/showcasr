@@ -9,8 +9,9 @@ class Login extends Component {
     super(props);
 
     this.state = {
+      error: null,
       form: {
-        username: '',
+        email: '',
         password: '',
       },
     };
@@ -18,6 +19,8 @@ class Login extends Component {
     this.onEmailInputChanged = this.onEmailInputChanged.bind(this);
     this.onPasswordInputChanged = this.onPasswordInputChanged.bind(this);
     this.onSubmitButtonPressed = this.onSubmitButtonPressed.bind(this);
+
+    this.renderError = this.renderError.bind(this);
   }
 
   onEmailInputChanged(event) {
@@ -42,7 +45,9 @@ class Login extends Component {
         this.state.form.password,
       )
       .then(console.log)
-      .catch(console.error);
+      .catch(error => {
+        this.setState({error: error.message});
+      });
   }
 
   render() {
@@ -74,6 +79,15 @@ class Login extends Component {
             </button>
           </div>
         </form>
+        {this.state.error ? this.renderError() : null}
+      </div>
+    );
+  }
+
+  renderError() {
+    return (
+      <div className="Login-error">
+        <p>{this.state.error}</p>
       </div>
     );
   }

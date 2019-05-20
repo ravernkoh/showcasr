@@ -37,3 +37,8 @@
 .Login-form-submit-button {
   margin-top: 10px;
 }
+
+.Login-error {
+  color: red;
+  font-style: italic;
+}
