@@ -16,15 +16,15 @@ const all = db => async query => {
       }
     }
     if (query.course) {
+      let found = false;
       for (const course of query.course) {
-        let found = false;
         if (project.course === course) {
           found = true;
           break;
         }
-        if (!found) {
-          return;
-        }
+      }
+      if (!found) {
+        return;
       }
     }
     if (query.title && !project.title.includes(query.title)) {
