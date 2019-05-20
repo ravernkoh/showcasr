@@ -8,11 +8,16 @@ Hosts the frontend for each device.
 
 ## Development
 
-Simply copy `.env.sample` to `.env` and set the variables appropriately.
+Install all the dependencies. _Note: `yarn` is to be used instead of `npm`._
+
+```bash
+$ yarn
+```
+
+Configure the `.env` file.
 
 ```bash
 $ cp .env.sample .env
-$ vim .env
 ```
 
 Then, start the development server.
