@@ -2,7 +2,7 @@ FROM node:11-alpine
 
 WORKDIR /usr/src/app
 
-ARG PORT=3000
+ARG PORT=80
 ARG NODE_ENV=production
 
 COPY package*.json ./
