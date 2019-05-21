@@ -2,6 +2,7 @@
   "name": "showcasr-backend",
   "private": true,
   "scripts": {
+    "start:prod": "node src/index.js",
     "start:dev": "nodemon src/index.js"
   },
   "author": "Ravern Koh",
