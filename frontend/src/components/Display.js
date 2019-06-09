@@ -14,11 +14,16 @@ class Display extends Component {
     super(props);
 
     this.state = {
+      // Stores the current `WebSocket` client.
       ws: null,
+      // The URL to connect the websocket to. Should only be set once.
+      wsURL: null,
       project: null,
     };
 
+    this.createWebSocket = this.createWebSocket.bind(this);
     this.onWebSocketMessage = this.onWebSocketMessage.bind(this);
+    this.onWebSocketClose = this.onWebSocketClose.bind(this);
     this.renderProject = this.renderProject.bind(this);
   }
 
@@ -27,11 +32,8 @@ class Display extends Component {
       .auth()
       .currentUser.getIdToken()
       .then(idToken => {
-        const ws = new WebSocket(
-          `${process.env.REACT_APP_WEBSOCKET_URL}?token=${idToken}`,
-        );
-        ws.onmessage = this.onWebSocketMessage;
-        this.setState({ws});
+        const wsURL = `${process.env.REACT_APP_WEBSOCKET_URL}?token=${idToken}`;
+        this.setState({wsURL}, () => this.createWebSocket());
       })
       .catch(console.error);
   }
@@ -40,8 +42,17 @@ class Display extends Component {
     this.state.ws.close();
   }
 
+  createWebSocket() {
+    const ws = new WebSocket(this.state.wsURL);
+    ws.onmessage = this.onWebSocketMessage;
+    ws.onclose = this.onWebSocketClose;
+    this.setState({ws});
+  }
+
   onWebSocketMessage(e) {
     const message = JSON.parse(e.data, JSON.dateParser);
+
+    console.log(message);
 
     switch (message.action) {
       case ACTION_UPDATE:
@@ -54,6 +65,11 @@ class Display extends Component {
       default:
         break;
     }
+  }
+
+  onWebSocketClose() {
+    // TODO: Change this to exponential backoff (somehow).
+    setTimeout(() => this.createWebSocket(), 1000);
   }
 
   render() {
