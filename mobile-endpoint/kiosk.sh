@@ -1,25 +1,29 @@
 #!/bin/sh -e
 
-ENV_FILE="./env"
-URL='website.url'
-USERNAME='usernames'
-PASSWORD='passwords'
+ENV_FILE="$HOME/dev/bin/env"
+URL='showcasr-frontend.ravern.co'
 
 main() {
     if [ -e "${ENV_FILE}" ]; then
+	log "Found ENV FILE"
         . "${ENV_FILE}"
+    else
+	log "DID NOT FIND ENV FILE"
     fi
     #ask_for_sudo
     check_internet_connection
+    lxterminal -l -e "journalctl -r -u kiosk --boot" &
     #update_pi
     #install_packages
     disable_screen_saver
     disable_chromium_warnings
     launch_chromium
     if [ -n "${USERNAME}" -a -n "${PASSWORD}" -a -n "${URL}" ]; then
-        sleep 10
+        sleep 30
         do_login
     fi
+
+    while true; do sleep 10;done # Leave the program running
 
 }
 
@@ -38,10 +42,10 @@ check_internet_connection() {
     log "Checking Internet conection"
 
     if  ! ping -c1 google.com > /dev/null 2>&1 ; then
-        echo "Internet connection failed"
+        log "Internet connection failed"
         exit 1
     else
-        echo "Internet connection available"
+        log "Internet connection available"
     fi
 }
 
@@ -53,6 +57,7 @@ update_pi() {
 
 install_packages() {
     log "Installing packages"
+    commad -v chromium-browser >/dev/null 2>&1 || sudo apt-get install -y chromium-browser
     command -v xdotool  >/dev/null 2>&1 || sudo apt-get install -y xdotool
     command -v uncluter >/dev/null 2>&1 || sudo apt-get install -y unclutter
 }
@@ -63,10 +68,10 @@ disable_screen_saver() {
     xset s off || true
     xset -dpms || true
     if ! pgrep -x "unclutter" > /dev/null; then
-        echo "Launching unclutter"
+        log "Launching unclutter"
         unclutter -idle 0.5 -root & # Hides mouse
     else
-        echo "unclutter already running"
+        log "unclutter already running"
     fi
 }
 
@@ -79,15 +84,25 @@ disable_chromium_warnings() {
 launch_chromium() {
     log "Launching chromium"
     /usr/bin/chromium-browser --noerrdialogs --disable-infobars --kiosk "${URL}" >/dev/null 2>&1 &
+    while ! pgrep chromium; do
+	    sleep 5
+    done
 }
 
 do_login() {
     log "Logging into the website"
+    
     xdotool click 1
+    sleep 1
     xdotool key "Tab"
+    sleep 1
     xdotool type "${USERNAME}"
+    sleep 1
     xdotool key "Tab"
+    sleep 1
     xdotool type "${PASSWORD}"
+    sleep 1
+    xdotool key "Return"
 }
 
 log() {
