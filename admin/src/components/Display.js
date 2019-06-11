@@ -5,6 +5,7 @@ import axios from '../axios';
 import './Display.css';
 
 const ACTION_CREATE = 'CREATE';
+const ACTION_DELETE = 'DELETE';
 const ACTION_UPDATE = 'UPDATE';
 
 class Display extends Component {
@@ -26,23 +27,23 @@ class Display extends Component {
     );
     this.onTagsInputChanged = this.onTagsInputChanged.bind(this);
     this.onCourseInputChanged = this.onCourseInputChanged.bind(this);
+    this.onDeleteButtonPressed = this.onDeleteButtonPressed.bind(this);
     this.onCreateButtonPressed = this.onCreateButtonPressed.bind(this);
 
+    this.reloadProjects = this.reloadProjects.bind(this);
+
     this.renderProject = this.renderProject.bind(this);
+    this.renderProjectForm = this.renderProjectForm.bind(this);
   }
 
   componentDidMount() {
-    axios
-      .get('/projects')
-      .then(res => res.data)
-      .then(projects => this.setState({projects}))
-      .catch(console.error);
+    this.reloadProjects();
   }
 
   onSaveButtonPressed() {
     this.setState({isSaving: true});
 
-    let hasUpdates = false;
+    let requests = [];
     for (let i = 0; i < this.state.projects.length; i++) {
       const project = this.state.projects[i];
 
@@ -50,29 +51,20 @@ class Display extends Component {
         continue;
       }
 
-      hasUpdates = true;
-
       switch (project.action) {
         case ACTION_CREATE:
-          axios
-            .post('/projects', project)
-            .then(res => res.data)
-            .then(project => {
-              this.state.projects[i] = project;
-              this.setState({isSaving: false, projects: this.state.projects});
-            })
-            .catch(console.error);
+          requests.push(axios.post('/projects', project));
           break;
 
         case ACTION_UPDATE:
-          axios
-            .patch(`/projects/${project.id}`, project)
-            .then(res => res.data)
-            .then(() => {
-              this.state.projects[i] = project;
-              this.setState({isSaving: false, projects: this.state.projects});
-            })
-            .catch(console.error);
+          const id = project.id;
+          delete project.id;
+          delete project.action;
+          requests.push(axios.patch(`/projects/${id}`, project));
+          break;
+
+        case ACTION_DELETE:
+          requests.push(axios.delete(`/projects/${project.id}`));
           break;
 
         default:
@@ -80,15 +72,36 @@ class Display extends Component {
       }
     }
 
-    if (!hasUpdates) {
+    if (requests.length === 0) {
       this.setState({isSaving: false});
+      return;
     }
+
+    Promise.all(requests)
+      .then(res => {
+        this.reloadProjects();
+        console.log(res);
+      })
+      .catch(error => {
+        this.reloadProjects();
+        console.error(error);
+      });
+  }
+
+  reloadProjects() {
+    axios
+      .get('/projects')
+      .then(res => res.data)
+      .then(projects => this.setState({isSaving: false, projects}))
+      .catch(console.error);
   }
 
   onTitleInputChanged(index) {
     return event => {
       const project = this.state.projects[index];
-      project.action = ACTION_UPDATE;
+      if (!project.action) {
+        project.action = ACTION_UPDATE;
+      }
       project.title = event.target.value;
       this.setState({projects: this.state.projects});
     };
@@ -97,7 +110,9 @@ class Display extends Component {
   onTagsInputChanged(index) {
     return event => {
       const project = this.state.projects[index];
-      project.action = ACTION_UPDATE;
+      if (!project.action) {
+        project.action = ACTION_UPDATE;
+      }
       project.tags = event.target.value.split(',').map(tag => tag.trim());
       this.setState({projects: this.state.projects});
     };
@@ -106,7 +121,9 @@ class Display extends Component {
   onDescriptionTextareaChanged(index) {
     return event => {
       const project = this.state.projects[index];
-      project.action = ACTION_UPDATE;
+      if (!project.action) {
+        project.action = ACTION_UPDATE;
+      }
       project.description = event.target.value;
       this.setState({projects: this.state.projects});
     };
@@ -115,7 +132,9 @@ class Display extends Component {
   onCourseInputChanged(index) {
     return event => {
       const project = this.state.projects[index];
-      project.action = ACTION_UPDATE;
+      if (!project.action) {
+        project.action = ACTION_UPDATE;
+      }
       project.course = event.target.value;
       this.setState({projects: this.state.projects});
     };
@@ -124,12 +143,25 @@ class Display extends Component {
   onAcademicYearInputChanged(index) {
     return event => {
       const project = this.state.projects[index];
-      project.action = ACTION_UPDATE;
+      if (!project.action) {
+        project.action = ACTION_UPDATE;
+      }
 
       try {
         project.academicYear = parseInt(event.target.value, 10);
       } catch (error) {}
+      if (isNaN(project.academicYear)) {
+        project.academicYear = '';
+      }
 
+      this.setState({projects: this.state.projects});
+    };
+  }
+
+  onDeleteButtonPressed(index) {
+    return () => {
+      const project = this.state.projects[index];
+      project.action = ACTION_DELETE;
       this.setState({projects: this.state.projects});
     };
   }
@@ -170,6 +202,17 @@ class Display extends Component {
   renderProject(project, index) {
     return (
       <div className="Display-project" key={index}>
+        {project.action === ACTION_DELETE
+          ? this.renderDeleteNote()
+          : this.renderProjectForm(project, index)}
+        <hr />
+      </div>
+    );
+  }
+
+  renderProjectForm(project, index) {
+    return (
+      <Fragment>
         <form className="Display-project-form">
           <div className="Display-project-form-group">
             <label htmlFor="title">Title</label>
@@ -216,9 +259,27 @@ class Display extends Component {
             />
           </div>
         </form>
-        <hr />
-      </div>
+        <button
+          className="Display-delete-button"
+          onClick={this.onDeleteButtonPressed(index)}>
+          Delete!
+        </button>
+        {project.action === ACTION_UPDATE ? this.renderUpdateNote() : null}
+        {project.action === ACTION_CREATE ? this.renderCreateNote() : null}
+      </Fragment>
     );
+  }
+
+  renderDeleteNote() {
+    return <span className="Display-note-delete">Deleted!</span>;
+  }
+
+  renderUpdateNote() {
+    return <span className="Display-note-update">Updated!</span>;
+  }
+
+  renderCreateNote() {
+    return <span className="Display-note-create">New!</span>;
   }
 }
 
