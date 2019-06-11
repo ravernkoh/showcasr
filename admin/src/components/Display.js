@@ -17,6 +17,8 @@ class Display extends Component {
       projects: [],
     };
 
+    this.onCollapsedProjectPressed = this.onCollapsedProjectPressed.bind(this);
+    this.onCloseButtonPressed = this.onCloseButtonPressed.bind(this);
     this.onSaveButtonPressed = this.onSaveButtonPressed.bind(this);
     this.onTitleInputChanged = this.onTitleInputChanged.bind(this);
     this.onAcademicYearInputChanged = this.onAcademicYearInputChanged.bind(
@@ -33,11 +35,28 @@ class Display extends Component {
     this.reloadProjects = this.reloadProjects.bind(this);
 
     this.renderProject = this.renderProject.bind(this);
+    this.renderCollapsedProject = this.renderCollapsedProject.bind(this);
     this.renderProjectForm = this.renderProjectForm.bind(this);
   }
 
   componentDidMount() {
     this.reloadProjects();
+  }
+
+  onCloseButtonPressed(index) {
+    return () => {
+      const project = this.state.projects[index];
+      project.isExpanded = false;
+      this.setState({projects: this.state.projects});
+    };
+  }
+
+  onCollapsedProjectPressed(index) {
+    return () => {
+      const project = this.state.projects[index];
+      project.isExpanded = true;
+      this.setState({projects: this.state.projects});
+    };
   }
 
   onSaveButtonPressed() {
@@ -53,6 +72,8 @@ class Display extends Component {
 
       switch (project.action) {
         case ACTION_CREATE:
+          delete project.action;
+          delete project.isExpanded;
           requests.push(axios.post('/projects', project));
           break;
 
@@ -60,6 +81,7 @@ class Display extends Component {
           const id = project.id;
           delete project.id;
           delete project.action;
+          delete project.isExpanded;
           requests.push(axios.patch(`/projects/${id}`, project));
           break;
 
@@ -168,6 +190,7 @@ class Display extends Component {
 
   onCreateButtonPressed() {
     this.state.projects.push({
+      isExpanded: true,
       action: ACTION_CREATE,
       title: '',
       course: '',
@@ -200,12 +223,32 @@ class Display extends Component {
   }
 
   renderProject(project, index) {
+    let content;
+
+    if (project.action === ACTION_DELETE) {
+      content = this.renderDeleteNote();
+    } else if (!project.isExpanded) {
+      content = this.renderCollapsedProject(project, index);
+    } else {
+      content = this.renderProjectForm(project, index);
+    }
+
     return (
       <div className="Display-project" key={index}>
-        {project.action === ACTION_DELETE
-          ? this.renderDeleteNote()
-          : this.renderProjectForm(project, index)}
+        {content}
         <hr />
+      </div>
+    );
+  }
+
+  renderCollapsedProject(project, index) {
+    return (
+      <div
+        className="Display-collapsed-project"
+        onClick={this.onCollapsedProjectPressed(index)}>
+        <p className="Display-collapsed-project-title">
+          {project.title || '<empty>'}
+        </p>
       </div>
     );
   }
@@ -260,14 +303,29 @@ class Display extends Component {
           </div>
         </form>
         <button
+          className="Display-close-button"
+          onClick={this.onCloseButtonPressed(index)}>
+          Close
+        </button>
+        <button
           className="Display-delete-button"
           onClick={this.onDeleteButtonPressed(index)}>
           Delete!
         </button>
-        {project.action === ACTION_UPDATE ? this.renderUpdateNote() : null}
-        {project.action === ACTION_CREATE ? this.renderCreateNote() : null}
+        {this.renderProjectNote(project)}
       </Fragment>
     );
+  }
+
+  renderProjectNote(project) {
+    switch (project.action) {
+      case ACTION_UPDATE:
+        return this.renderUpdateNote();
+      case ACTION_CREATE:
+        return this.renderCreateNote();
+      default:
+        return null;
+    }
   }
 
   renderDeleteNote() {

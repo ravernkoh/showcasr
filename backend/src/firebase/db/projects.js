@@ -72,6 +72,7 @@ const insert = db => async project => {
 
 const update = db => async project => {
   const id = project.id;
+  delete project.id;
 
   project = filterProject(project);
 
