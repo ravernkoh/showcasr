@@ -27,6 +27,15 @@ const buildRouter = env => {
   router.use(
     CORS({
       origin: '*',
+      allowMethods: [
+        'GET',
+        'PUT',
+        'POST',
+        'PATCH',
+        'DELETE',
+        'HEAD',
+        'OPTIONS',
+      ],
     }),
   );
   router.use(bodyParser());

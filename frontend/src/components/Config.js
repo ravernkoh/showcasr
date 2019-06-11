@@ -107,7 +107,7 @@ class Config extends Component {
             <label htmlFor="tags">Tags</label>
             <input
               type="text"
-              value={this.state.form.tags.join(', ')}
+              value={this.state.form.tags.join(',')}
               onChange={this.onTagsInputChanged}
               name="tags"
             />
@@ -116,7 +116,7 @@ class Config extends Component {
             <label htmlFor="course">Course</label>
             <input
               type="text"
-              value={this.state.form.course.join(', ')}
+              value={this.state.form.course.join(',')}
               onChange={this.onCourseInputChanged}
               name="course"
             />

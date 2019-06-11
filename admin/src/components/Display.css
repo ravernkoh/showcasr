@@ -1,0 +1,82 @@
+.Display-save-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 16px;
+}
+
+.Display-projects {
+  height: 100vh;
+  overflow-y: scroll;
+}
+
+.Display-project {
+  width: 480px;
+  padding: 10px;
+}
+
+.Display-project hr {
+  margin-bottom: 0;
+}
+
+.Display-project input {
+  font-size: 16px;
+}
+
+.Display-collapsed-project-title {
+  font-weight: bold;
+  margin-top: 0;
+}
+
+.Display-project button {
+  font-size: 16px;
+}
+
+.Display-project textarea {
+  font-size: 16px;
+}
+
+.Display-project-form-group {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.Display-project-form-group label {
+  width: 100px;
+}
+
+.Display-project-form-group input {
+  flex-grow: 1;
+}
+
+.Display-project-form-group textarea {
+  flex-grow: 1;
+  height: 100px;
+}
+
+.Display-create-button {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+.Display-note-delete {
+  color: red;
+  font-style: italic;
+}
+
+.Display-note-update {
+  display: block;
+  margin-top: 10px;
+  color: orange;
+  font-style: italic;
+}
+
+.Display-note-create {
+  display: block;
+  margin-top: 10px;
+  color: green;
+  font-style: italic;
+}

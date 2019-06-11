@@ -61,7 +61,7 @@ const get = db => async id => {
 const insert = db => async project => {
   project = filterProject(project);
 
-  const ref = await db.collection('projects').add(filteredProject);
+  const ref = await db.collection('projects').add(project);
   const doc = await ref.get();
 
   project = convertTimestampsToDates(doc.data());
@@ -72,10 +72,11 @@ const insert = db => async project => {
 
 const update = db => async project => {
   const id = project.id;
+  delete project.id;
 
   project = filterProject(project);
 
-  const doc = await db
+  let doc = await db
     .collection('projects')
     .doc(id)
     .get();
