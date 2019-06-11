@@ -12,7 +12,7 @@ const main = async env => {
   const app = new Koa();
 
   app.context.db = db;
-  app.context.core = core({interval: 1000});
+  app.context.core = core({interval: 3000});
 
   app.context.core.startDisplay();
 
