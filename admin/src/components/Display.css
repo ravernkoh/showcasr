@@ -45,3 +45,10 @@
   flex-grow: 1;
   height: 100px;
 }
+
+.Display-create-button {
+  margin-top: 5px;
+  margin-left: 5px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
