@@ -1,6 +1,6 @@
-# Frontend
+# Admin
 
-Hosts the frontend for each device.
+Hosts the admin interface.
 
 ## Requirements
 
