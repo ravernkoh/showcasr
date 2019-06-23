@@ -47,7 +47,7 @@ make_directories() {
 
 clone_repository() {
     log "Cloning Repository"
-    git clone github.com/ravernkoh/showcasr "$INSTALL_DIR"
+    git clone https://github.com/ravernkoh/showcasr "$INSTALL_DIR"
 }
 
 copy_files() {
@@ -57,7 +57,7 @@ copy_files() {
 }
 
 start_systemd() {
-    sudo systemctl enable kiosk.sh
+    sudo systemctl enable kiosk.service
     log "update env file located at $HOME/dev/bin/env"
     log "After updating env file, restart system"
 }
