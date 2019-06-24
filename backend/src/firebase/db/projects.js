@@ -18,7 +18,7 @@ const all = db => async query => {
         }
       }
     }
-    if (query.course) {
+    if (query.course && query.course.length !== 0) {
       let found = false;
       for (const course of query.course) {
         if (project.course === course) {
@@ -30,10 +30,18 @@ const all = db => async query => {
         return;
       }
     }
-    if (query.title && !project.title.includes(query.title)) {
+    if (
+      query.title &&
+      query.title !== '' &&
+      !project.title.includes(query.title)
+    ) {
       return;
     }
-    if (query.description && !project.description.includes(query.description)) {
+    if (
+      query.description &&
+      query.description !== '' &&
+      !project.description.includes(query.description)
+    ) {
       return;
     }
 
