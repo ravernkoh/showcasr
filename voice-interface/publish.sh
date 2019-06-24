@@ -1,0 +1,1 @@
+rm function.zip && cd src && zip -r9 ../function.zip . && zip -g ../function.zip lambda_function.py && cd ../ && aws lambda update-function-code --function-name showcasr --zip-file fileb://function.zip
