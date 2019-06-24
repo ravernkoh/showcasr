@@ -1,5 +1,8 @@
 import React, {Fragment, Component} from 'react';
 
+import uuid from 'uuid';
+import firebase from 'firebase/app';
+
 import axios from '../axios';
 
 import './Display.css';
@@ -7,6 +10,9 @@ import './Display.css';
 const ACTION_CREATE = 'CREATE';
 const ACTION_DELETE = 'DELETE';
 const ACTION_UPDATE = 'UPDATE';
+
+const IMAGE_LOCAL = 'LOCAL';
+const IMAGE_REMOTE = 'REMOTE';
 
 class Display extends Component {
   constructor(props) {
@@ -27,6 +33,7 @@ class Display extends Component {
     this.onDescriptionTextareaChanged = this.onDescriptionTextareaChanged.bind(
       this,
     );
+    this.onImageInputChanged = this.onImageInputChanged.bind(this);
     this.onTagsInputChanged = this.onTagsInputChanged.bind(this);
     this.onCourseInputChanged = this.onCourseInputChanged.bind(this);
     this.onDeleteButtonPressed = this.onDeleteButtonPressed.bind(this);
@@ -62,7 +69,79 @@ class Display extends Component {
   onSaveButtonPressed() {
     this.setState({isSaving: true});
 
-    let requests = [];
+    this.uploadProjectImages()
+      .then(() => this.saveProjects())
+      .then(res => {
+        this.reloadProjects();
+        console.log(res);
+      })
+      .catch(error => {
+        this.reloadProjects();
+        console.error(error);
+      });
+  }
+
+  async uploadProjectImages() {
+    const indexes = [];
+    const requests = [];
+
+    for (let i = 0; i < this.state.projects.length; i++) {
+      const project = this.state.projects[i];
+
+      if (!project.action) {
+        continue;
+      }
+
+      if (
+        project.action !== ACTION_CREATE &&
+        project.action !== ACTION_UPDATE
+      ) {
+        continue;
+      }
+
+      if (project.image.type !== IMAGE_LOCAL) {
+        continue;
+      }
+
+      const ext = /(?:\.([^.]+))?$/.exec(project.image.file.name)[1];
+      const name = project.image.file.name.replace(/\.[^/.]+$/, '');
+
+      indexes.push(i);
+      requests.push(
+        firebase
+          .storage()
+          .ref()
+          .child(`images/posters/${name}-${uuid()}.${ext}`)
+          .put(project.image.file),
+      );
+
+      delete project.image.type;
+    }
+
+    if (requests.length === 0) {
+      return;
+    }
+
+    const snapshots = await Promise.all(requests);
+
+    for (let i = 0; i < snapshots.length; i++) {
+      const index = indexes[i];
+      const snapshot = snapshots[i];
+
+      const url = await snapshot.ref.getDownloadURL();
+
+      const project = this.state.projects[index];
+      project.image = {
+        type: IMAGE_REMOTE,
+        url,
+      };
+      this.setState({projects: this.state.projects});
+    }
+  }
+
+  async saveProjects() {
+    const requests = [];
+
     for (let i = 0; i < this.state.projects.length; i++) {
       const project = this.state.projects[i];
 
@@ -72,6 +151,7 @@ class Display extends Component {
 
       switch (project.action) {
         case ACTION_CREATE:
+          project.image = project.image.url;
           delete project.action;
           delete project.isExpanded;
           requests.push(axios.post('/projects', project));
@@ -80,6 +160,7 @@ class Display extends Component {
         case ACTION_UPDATE:
           const id = project.id;
           delete project.id;
+          project.image = project.image.url;
           delete project.action;
           delete project.isExpanded;
           requests.push(axios.patch(`/projects/${id}`, project));
@@ -99,21 +180,22 @@ class Display extends Component {
       return;
     }
 
-    Promise.all(requests)
-      .then(res => {
-        this.reloadProjects();
-        console.log(res);
-      })
-      .catch(error => {
-        this.reloadProjects();
-        console.error(error);
-      });
+    await Promise.all(requests);
   }
 
   reloadProjects() {
     axios
       .get('/projects')
       .then(res => res.data)
+      .then(projects =>
+        projects.map(project => {
+          project.image = {
+            type: IMAGE_REMOTE,
+            url: project.image,
+          };
+          return project;
+        }),
+      )
       .then(projects => this.setState({isSaving: false, projects}))
       .catch(console.error);
   }
@@ -147,6 +229,21 @@ class Display extends Component {
         project.action = ACTION_UPDATE;
       }
       project.description = event.target.value;
+      this.setState({projects: this.state.projects});
+    };
+  }
+
+  onImageInputChanged(index) {
+    return event => {
+      const project = this.state.projects[index];
+      if (!project.action) {
+        project.action = ACTION_UPDATE;
+      }
+      project.image = {
+        type: IMAGE_LOCAL,
+        file: event.target.files[0],
+        url: URL.createObjectURL(event.target.files[0]),
+      };
       this.setState({projects: this.state.projects});
     };
   }
@@ -300,6 +397,21 @@ class Display extends Component {
               onChange={this.onDescriptionTextareaChanged(index)}
               name="description"
             />
+          </div>
+          <div className="Display-project-form-group">
+            <label htmlFor="image">Image</label>
+            <div className="Display-project-form-image">
+              <img
+                className="Display-project-form-image-preview"
+                src={project.image.url}
+                alt="Project Poster"
+              />
+              <input
+                type="file"
+                onChange={this.onImageInputChanged(index)}
+                name="image"
+              />
+            </div>
           </div>
         </form>
         <button

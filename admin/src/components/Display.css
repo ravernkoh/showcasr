@@ -50,9 +50,23 @@
   flex-grow: 1;
 }
 
+.Display-project-form-group input[type='file'] {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .Display-project-form-group textarea {
   flex-grow: 1;
   height: 100px;
+}
+
+.Display-project-form-image {
+  display: flex;
+  flex-direction: column;
+}
+
+.Display-project-form-image-preview {
+  width: 200px;
 }
 
 .Display-create-button {
