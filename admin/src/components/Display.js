@@ -8,6 +8,9 @@ const ACTION_CREATE = 'CREATE';
 const ACTION_DELETE = 'DELETE';
 const ACTION_UPDATE = 'UPDATE';
 
+const IMAGE_LOCAL = 'LOCAL';
+const IMAGE_REMOTE = 'REMOTE';
+
 class Display extends Component {
   constructor(props) {
     super(props);
@@ -27,6 +30,7 @@ class Display extends Component {
     this.onDescriptionTextareaChanged = this.onDescriptionTextareaChanged.bind(
       this,
     );
+    this.onImageInputChanged = this.onImageInputChanged.bind(this);
     this.onTagsInputChanged = this.onTagsInputChanged.bind(this);
     this.onCourseInputChanged = this.onCourseInputChanged.bind(this);
     this.onDeleteButtonPressed = this.onDeleteButtonPressed.bind(this);
@@ -114,6 +118,15 @@ class Display extends Component {
     axios
       .get('/projects')
       .then(res => res.data)
+      .then(projects =>
+        projects.map(project => {
+          project.image = {
+            type: IMAGE_REMOTE,
+            url: project.image,
+          };
+          return project;
+        }),
+      )
       .then(projects => this.setState({isSaving: false, projects}))
       .catch(console.error);
   }
@@ -147,6 +160,21 @@ class Display extends Component {
         project.action = ACTION_UPDATE;
       }
       project.description = event.target.value;
+      this.setState({projects: this.state.projects});
+    };
+  }
+
+  onImageInputChanged(index) {
+    return event => {
+      const project = this.state.projects[index];
+      if (!project.action) {
+        project.action = ACTION_UPDATE;
+      }
+      project.image = {
+        type: IMAGE_LOCAL,
+        file: event.target.files[0],
+        url: URL.createObjectURL(event.target.files[0]),
+      };
       this.setState({projects: this.state.projects});
     };
   }
@@ -300,6 +328,21 @@ class Display extends Component {
               onChange={this.onDescriptionTextareaChanged(index)}
               name="description"
             />
+          </div>
+          <div className="Display-project-form-group">
+            <label htmlFor="image">Image</label>
+            <div className="Display-project-form-image">
+              <img
+                className="Display-project-form-image-preview"
+                src={project.image.url}
+                alt="Project image"
+              />
+              <input
+                type="file"
+                onChange={this.onImageInputChanged(index)}
+                name="image"
+              />
+            </div>
           </div>
         </form>
         <button
