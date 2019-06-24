@@ -69,6 +69,7 @@ class Display extends Component {
   onSaveButtonPressed() {
     this.setState({isSaving: true});
 
+<<<<<<< HEAD
     this.uploadProjectImages()
       .then(() => this.saveProjects())
       .then(res => {
