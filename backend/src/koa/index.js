@@ -1,12 +1,12 @@
-const Router = require('koa-router');
-const bodyParser = require('koa-bodyparser');
-const bearerToken = require('koa-bearer-token');
-const CORS = require('koa2-cors');
-const websocket = require('koa-easy-ws');
+const Router = require("koa-router");
+const bodyParser = require("koa-bodyparser");
+const bearerToken = require("koa-bearer-token");
+const CORS = require("koa2-cors");
+const websocket = require("koa-easy-ws");
 
-const auth = require('./auth');
-const projects = require('./projects');
-const live = require('./live');
+const auth = require("./auth");
+const projects = require("./projects");
+const live = require("./live");
 
 const buildProjectsRouter = env => {
   const router = new Router();
@@ -26,36 +26,36 @@ const buildRouter = env => {
 
   router.use(
     CORS({
-      origin: '*',
+      origin: "*",
       allowMethods: [
-        'GET',
-        'PUT',
-        'POST',
-        'PATCH',
-        'DELETE',
-        'HEAD',
-        'OPTIONS',
+        "GET",
+        "PUT",
+        "POST",
+        "PATCH",
+        "DELETE",
+        "HEAD",
+        "OPTIONS",
       ],
-    }),
+    })
   );
   router.use(bodyParser());
   router.use(bearerToken());
   router.use(websocket());
 
   // In order to satisfy CORS.
-  router.options('*', (ctx, next) => {
+  router.options("*", (ctx, next) => {
     ctx.status = 200;
   });
 
   const projectsRouter = buildProjectsRouter(env);
   router.use(
-    '/projects',
+    "/projects",
     projectsRouter.routes(),
-    projectsRouter.allowedMethods(),
+    projectsRouter.allowedMethods()
   );
 
   const liveRouter = buildLiveRouter(env);
-  router.use('/live', liveRouter.routes(), liveRouter.allowedMethods());
+  router.use("/live", liveRouter.routes(), liveRouter.allowedMethods());
 
   return router;
 };

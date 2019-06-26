@@ -1,18 +1,18 @@
-const dotenv = require('dotenv');
-const Koa = require('koa');
+const dotenv = require("dotenv");
+const Koa = require("koa");
 
-const firebase = require('./firebase');
-const core = require('./core');
-const koa = require('./koa');
-const util = require('./util');
+const firebase = require("./firebase");
+const core = require("./core");
+const koa = require("./koa");
+const util = require("./util");
 
 const main = async env => {
-  const {db} = await firebase();
+  const { db } = await firebase();
 
   const app = new Koa();
 
   app.context.db = db;
-  app.context.core = core({interval: 10000});
+  app.context.core = core({ interval: 10000 });
 
   app.context.core.startDisplay();
 
