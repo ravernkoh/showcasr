@@ -15,8 +15,8 @@ const startDisplay = core => () => {
 
 // Stops any existing displays.
 const stopDisplay = core => () => {
-  if (this.intervalHandle) {
-    clearInterval(this.intervalHandle);
+  if (core.intervalHandle) {
+    clearInterval(core.intervalHandle);
   }
 };
 

@@ -45,6 +45,15 @@ const all = db => async query => {
       return;
     }
 
+
+    if( query.academicYear &&
+        Array.isArray(query.academicYear) &&
+        query.academicYear.length == 2 &&
+        query.academicYear[0] > project.academicYear &&
+        query.academicYear[1] < project.academicYear) {
+        return;
+    }
+
     projects.push(project);
   });
 
