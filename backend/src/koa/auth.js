@@ -1,4 +1,4 @@
-const firebase = require('firebase-admin');
+const firebase = require("firebase-admin");
 
 module.exports = options => async (ctx, next) => {
   // TODO: Handle error properly.

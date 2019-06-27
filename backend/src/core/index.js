@@ -1,9 +1,9 @@
-const queue = require('./queue');
+const queue = require("./queue");
 
 const core = {};
 
-const ACTION_UPDATE = 'UPDATE';
-const ACTION_CLEAR = 'CLEAR';
+const ACTION_UPDATE = "UPDATE";
+const ACTION_CLEAR = "CLEAR";
 
 // Stops any existing displays and starts a new display loop.
 const startDisplay = core => () => {
@@ -15,8 +15,8 @@ const startDisplay = core => () => {
 
 // Stops any existing displays.
 const stopDisplay = core => () => {
-  if (this.intervalHandle) {
-    clearInterval(this.intervalHandle);
+  if (core.intervalHandle) {
+    clearInterval(core.intervalHandle);
   }
 };
 
@@ -33,7 +33,7 @@ const addClient = core => client => {
     JSON.stringify({
       action: ACTION_UPDATE,
       data: client.project,
-    }),
+    })
   );
 };
 
@@ -60,7 +60,7 @@ const rotateClients = core => () => {
       client.ws.send(
         JSON.stringify({
           action: ACTION_CLEAR,
-        }),
+        })
       );
       continue;
     }
@@ -69,7 +69,7 @@ const rotateClients = core => () => {
       JSON.stringify({
         action: ACTION_UPDATE,
         data: client.project,
-      }),
+      })
     );
   }
 };
@@ -78,7 +78,7 @@ const setProjects = core => projects => {
   core.projects = queue(projects);
 };
 
-module.exports = ({interval}) => {
+module.exports = ({ interval }) => {
   const core = {
     options: {
       interval,

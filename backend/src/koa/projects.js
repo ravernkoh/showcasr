@@ -25,13 +25,13 @@ const update = async ctx => {
 const _delete = async ctx => {
   const id = ctx.params.id;
   await ctx.db.projects.delete(id);
-  ctx.body = {message: 'Success!'};
+  ctx.body = { message: "Success!" };
 };
 
 module.exports = (env, router) => {
-  router.get('/', all);
-  router.post('/', insert);
-  router.get('/:id', get);
-  router.patch('/:id', update);
-  router.delete('/:id', _delete);
+  router.get("/", all);
+  router.post("/", insert);
+  router.get("/:id", get);
+  router.patch("/:id", update);
+  router.delete("/:id", _delete);
 };

@@ -1,10 +1,10 @@
-const {NotFoundError} = require('./errors');
-const {convertTimestampsToDates} = require('./util');
+const { NotFoundError } = require("./errors");
+const { convertTimestampsToDates } = require("./util");
 
 const all = db => async query => {
   const projects = [];
 
-  const snapshot = await db.collection('projects').get();
+  const snapshot = await db.collection("projects").get();
   snapshot.forEach(doc => {
     const project = convertTimestampsToDates(doc.data());
 
@@ -32,17 +32,25 @@ const all = db => async query => {
     }
     if (
       query.title &&
-      query.title !== '' &&
+      query.title !== "" &&
       !project.title.includes(query.title)
     ) {
       return;
     }
     if (
       query.description &&
-      query.description !== '' &&
+      query.description !== "" &&
       !project.description.includes(query.description)
     ) {
       return;
+    }
+
+    if( query.academicYear &&
+        Array.isArray(query.academicYear) &&
+        query.academicYear.length == 2 &&
+        query.academicYear[0] > project.academicYear &&
+        query.academicYear[1] < project.academicYear) {
+        return;
     }
 
     projects.push(project);
@@ -53,12 +61,12 @@ const all = db => async query => {
 
 const get = db => async id => {
   const doc = await db
-    .collection('projects')
+    .collection("projects")
     .doc(id)
     .get();
 
   if (!doc.exists) {
-    throw new NotFoundError('project not found');
+    throw new NotFoundError("project not found");
   }
 
   const project = convertTimestampsToDates(doc.data());
@@ -69,7 +77,7 @@ const get = db => async id => {
 const insert = db => async project => {
   project = filterProject(project);
 
-  const ref = await db.collection('projects').add(project);
+  const ref = await db.collection("projects").add(project);
   const doc = await ref.get();
 
   project = convertTimestampsToDates(doc.data());
@@ -85,20 +93,20 @@ const update = db => async project => {
   project = filterProject(project);
 
   let doc = await db
-    .collection('projects')
+    .collection("projects")
     .doc(id)
     .get();
 
   if (!doc.exists) {
-    throw new NotFoundError('project not found');
+    throw new NotFoundError("project not found");
   }
 
   await db
-    .collection('projects')
+    .collection("projects")
     .doc(id)
-    .set(project, {merge: true});
+    .set(project, { merge: true });
   doc = await db
-    .collection('projects')
+    .collection("projects")
     .doc(id)
     .get();
 
@@ -109,16 +117,16 @@ const update = db => async project => {
 
 const _delete = db => async id => {
   const doc = await db
-    .collection('projects')
+    .collection("projects")
     .doc(id)
     .get();
 
   if (!doc.exists) {
-    throw new NotFoundError('project not found');
+    throw new NotFoundError("project not found");
   }
 
   await db
-    .collection('projects')
+    .collection("projects")
     .doc(id)
     .delete();
 };
@@ -167,6 +175,6 @@ module.exports = db => {
     get: get(db),
     insert: insert(db),
     update: update(db),
-    delete: _delete(db),
+    delete: _delete(db)
   };
 };

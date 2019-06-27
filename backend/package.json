@@ -3,11 +3,13 @@
   "private": true,
   "scripts": {
     "start:prod": "node src/index.js",
-    "start:dev": "nodemon src/index.js"
+    "start:dev": "nodemon src/index.js",
+    "format": "prettier --write src/**/**.js"
   },
   "author": "Ravern Koh",
   "devDependencies": {
-    "nodemon": "^1.19.0"
+    "nodemon": "^1.19.0",
+    "prettier": "1.18.2"
   },
   "dependencies": {
     "dotenv": "^8.0.0",

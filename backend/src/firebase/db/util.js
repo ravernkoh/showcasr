@@ -1,4 +1,4 @@
-const firebase = require('firebase-admin');
+const firebase = require("firebase-admin");
 
 // Converts all the Firebase `Timestamp` objects to native `Date` objects.
 //
@@ -13,5 +13,5 @@ convertTimestampsToDates = object => {
 };
 
 module.exports = {
-  convertTimestampsToDates,
+  convertTimestampsToDates
 };

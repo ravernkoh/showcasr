@@ -1,7 +1,7 @@
-const firebase = require('firebase-admin');
-const uuid = require('uuid/v4');
+const firebase = require("firebase-admin");
+const uuid = require("uuid/v4");
 
-const auth = require('./auth');
+const auth = require("./auth");
 
 // Get live updates of which project to display.
 const get = async ctx => {
@@ -23,14 +23,14 @@ const get = async ctx => {
     const id = uuid();
 
     const ws = await ctx.ws();
-    ws.on('close', () => {
+    ws.on("close", () => {
       ctx.core.removeClient(id);
     });
 
-    ctx.core.addClient({id, ws});
+    ctx.core.addClient({ id, ws });
   }
   ctx.status = 500;
-  ctx.body = {message: 'Could not start websocket connection'};
+  ctx.body = { message: "Could not start websocket connection" };
 };
 
 // Configure the current projects.
@@ -41,10 +41,10 @@ const post = async ctx => {
   const projects = await ctx.db.projects.all(query);
   ctx.core.setProjects(projects);
 
-  ctx.body = {message: 'Success!'};
+  ctx.body = { message: "Success!" };
 };
 
 module.exports = (env, router) => {
-  router.get('/', get);
-  router.post('/', auth(), post);
+  router.get("/", get);
+  router.post("/", auth(), post);
 };
