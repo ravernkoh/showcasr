@@ -35,7 +35,8 @@
 
 .Display-collapsed-project-title {
   font-weight: bold;
-  margin-top: 0;
+  margin: 0;
+  font-size: 24px;
 }
 
 .Display-project button {
@@ -47,17 +48,21 @@
 }
 
 .Display-project-form-group {
+  margin-top: 10px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 5px 0;
 }
 
 .Display-project-form-group label {
-  width: 100px;
+  margin-bottom: 5px;
 }
 
 .Display-project-form-group input {
   flex-grow: 1;
+  padding: 5px;
+  border-radius: 3px;
+  border-width: 1px;
 }
 
 .Display-project-form-group input[type='file'] {
@@ -68,6 +73,7 @@
 .Display-project-form-group textarea {
   flex-grow: 1;
   height: 100px;
+  border-radius: 3px;
 }
 
 .Display-project-form-image {
@@ -90,6 +96,23 @@
   border-width: 0;
   padding: 10px;
   box-shadow: 2px 2px 5px grey;
+}
+
+.Display-close-button {
+  margin-right: 10px;
+  border-radius: 5px;
+  background-color: grey;
+  color: white;
+  border-width: 0;
+  padding: 10px;
+}
+
+.Display-delete-button {
+  border-radius: 5px;
+  background-color: red;
+  color: white;
+  border-width: 0;
+  padding: 10px;
 }
 
 .Display-note-delete {
