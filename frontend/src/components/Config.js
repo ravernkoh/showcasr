@@ -105,6 +105,7 @@ class Config extends Component {
           </div>
           <div className="Config-form-group">
             <label htmlFor="tags">Tags</label>
+            <small>Comma-separated list of tags</small>
             <input
               type="text"
               value={this.state.form.tags.join(',')}
@@ -114,6 +115,7 @@ class Config extends Component {
           </div>
           <div className="Config-form-group">
             <label htmlFor="course">Course</label>
+            <small>Comma-separated list of tags</small>
             <input
               type="text"
               value={this.state.form.course.join(',')}

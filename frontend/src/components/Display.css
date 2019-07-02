@@ -8,3 +8,10 @@
 .Display-project-image {
   height: 100%;
 }
+
+.Display-empty-state {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -307,13 +307,15 @@ class Display extends Component {
           disabled={this.state.isSaving}>
           {this.state.isSaving ? 'Saving...' : 'Save'}
         </button>
-        <div className="Display-projects">
-          {this.state.projects.map(this.renderProject)}
-          <button
-            className="Display-create-button"
-            onClick={this.onCreateButtonPressed}>
-            Create
-          </button>
+        <div className="Display-projects-container">
+          <div className="Display-projects">
+            {this.state.projects.map(this.renderProject)}
+            <button
+              className="Display-create-button"
+              onClick={this.onCreateButtonPressed}>
+              Add New
+            </button>
+          </div>
         </div>
       </Fragment>
     );
@@ -333,7 +335,6 @@ class Display extends Component {
     return (
       <div className="Display-project" key={index}>
         {content}
-        <hr />
       </div>
     );
   }
@@ -403,7 +404,7 @@ class Display extends Component {
             <div className="Display-project-form-image">
               <img
                 className="Display-project-form-image-preview"
-                src={project.image.url}
+                src={project.image ? project.image.url : ''}
                 alt="Project Poster"
               />
               <input
