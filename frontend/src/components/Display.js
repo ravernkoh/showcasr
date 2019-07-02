@@ -1,6 +1,7 @@
 import React, {Fragment, Component} from 'react';
 
 import firebase from 'firebase/app';
+import YouTube from 'react-youtube';
 
 import Config from './Config';
 
@@ -97,6 +98,17 @@ class Display extends Component {
           src={this.state.project.image}
           alt={this.state.project.title}
         />
+        {this.state.project.video ? (
+          <YouTube
+            videoId={this.state.project.video}
+            opts={{
+              playerVars: {
+                autoplay: 1,
+                controls: 0,
+              },
+            }}
+          />
+        ) : null}
       </div>
     );
   }
