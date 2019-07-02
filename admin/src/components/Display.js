@@ -103,6 +103,10 @@ class Display extends Component {
         continue;
       }
 
+      if (!project.image) {
+        continue;
+      }
+
       if (project.image.type !== IMAGE_LOCAL) {
         continue;
       }
@@ -155,7 +159,9 @@ class Display extends Component {
 
       switch (project.action) {
         case ACTION_CREATE:
-          project.image = project.image.url;
+          if (project.image) {
+            project.image = project.image.url;
+          }
           delete project.action;
           delete project.isExpanded;
           requests.push(axios.post('/projects', project));
@@ -164,7 +170,9 @@ class Display extends Component {
         case ACTION_UPDATE:
           const id = project.id;
           delete project.id;
-          project.image = project.image.url;
+          if (project.image) {
+            project.image = project.image.url;
+          }
           delete project.action;
           delete project.isExpanded;
           requests.push(axios.patch(`/projects/${id}`, project));
