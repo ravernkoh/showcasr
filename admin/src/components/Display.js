@@ -23,6 +23,10 @@ class Display extends Component {
       projects: [],
     };
 
+    this.onExpandAllButtonPressed = this.onExpandAllButtonPressed.bind(this);
+    this.onCollapseAllButtonPressed = this.onCollapseAllButtonPressed.bind(
+      this,
+    );
     this.onCollapsedProjectPressed = this.onCollapsedProjectPressed.bind(this);
     this.onCloseButtonPressed = this.onCloseButtonPressed.bind(this);
     this.onSaveButtonPressed = this.onSaveButtonPressed.bind(this);
@@ -200,6 +204,22 @@ class Display extends Component {
       .catch(console.error);
   }
 
+  onExpandAllButtonPressed() {
+    const projects = this.state.projects;
+    for (const project of projects) {
+      project.isExpanded = true;
+    }
+    this.setState({projects});
+  }
+
+  onCollapseAllButtonPressed() {
+    const projects = this.state.projects;
+    for (const project of projects) {
+      project.isExpanded = false;
+    }
+    this.setState({projects});
+  }
+
   onTitleInputChanged(index) {
     return event => {
       const project = this.state.projects[index];
@@ -301,12 +321,24 @@ class Display extends Component {
   render() {
     return (
       <Fragment>
-        <button
-          className="Display-save-button"
-          onClick={this.onSaveButtonPressed}
-          disabled={this.state.isSaving}>
-          {this.state.isSaving ? 'Saving...' : 'Save'}
-        </button>
+        <div className="Display-side-buttons">
+          <button
+            className="Display-expand-all-button"
+            onClick={this.onExpandAllButtonPressed}>
+            Expand All
+          </button>
+          <button
+            className="Display-collapse-all-button"
+            onClick={this.onCollapseAllButtonPressed}>
+            Collapse All
+          </button>
+          <button
+            className="Display-save-button"
+            onClick={this.onSaveButtonPressed}
+            disabled={this.state.isSaving}>
+            {this.state.isSaving ? 'Saving...' : 'Save'}
+          </button>
+        </div>
         <div className="Display-projects-container">
           <div className="Display-projects">
             {this.state.projects.map(this.renderProject)}

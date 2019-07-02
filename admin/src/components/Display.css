@@ -1,7 +1,12 @@
-.Display-save-button {
+.Display-side-buttons {
   position: absolute;
   bottom: 20px;
   right: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.Display-save-button {
   font-size: 16px;
   background-color: #61a4fa;
   color: white;
@@ -9,6 +14,28 @@
   border-width: 0;
   padding: 10px;
   box-shadow: 2px 2px 5px grey;
+}
+
+.Display-expand-all-button {
+  font-size: 16px;
+  background-color: grey;
+  color: white;
+  border-radius: 5px;
+  border-width: 0;
+  padding: 10px;
+  box-shadow: 2px 2px 5px grey;
+  margin-bottom: 10px;
+}
+
+.Display-collapse-all-button {
+  font-size: 16px;
+  background-color: grey;
+  color: white;
+  border-radius: 5px;
+  border-width: 0;
+  padding: 10px;
+  box-shadow: 2px 2px 5px grey;
+  margin-bottom: 10px;
 }
 
 .Display-projects-container {
