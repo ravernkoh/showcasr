@@ -442,15 +442,25 @@ class Display extends Component {
   }
 
   renderDeleteNote() {
-    return <span className="Display-note-delete">Deleted!</span>;
+    return (
+      <span className="Display-note-delete">
+        Project pending deletion, please save!
+      </span>
+    );
   }
 
   renderUpdateNote() {
-    return <span className="Display-note-update">Updated!</span>;
+    return (
+      <span className="Display-note-update">Project edited, please save.</span>
+    );
   }
 
   renderCreateNote() {
-    return <span className="Display-note-create">New!</span>;
+    return (
+      <span className="Display-note-create">
+        Project pending creation, please save.
+      </span>
+    );
   }
 }
 
