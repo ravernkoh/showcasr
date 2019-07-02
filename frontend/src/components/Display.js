@@ -76,8 +76,16 @@ class Display extends Component {
     return (
       <Fragment>
         <Config />
-        {this.state.project ? this.renderProject() : 'Empty!'}
+        {this.state.project ? this.renderProject() : this.renderEmptyState()}
       </Fragment>
+    );
+  }
+
+  renderEmptyState() {
+    return (
+      <div className="Display-empty-state">
+        No projects loaded... configure below.
+      </div>
     );
   }
 
