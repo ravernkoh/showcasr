@@ -11,7 +11,7 @@ const all = db => async query => {
     project.id = doc.id;
 
     // Filter based on the different `query` properties.
-    if (query.tags) {
+    if (query.tags && !query.tags.includes("all")) {
       for (const tag of query.tags) {
         if (!project.tags.includes(tag)) {
           return;
@@ -45,12 +45,14 @@ const all = db => async query => {
       return;
     }
 
-    if( query.academicYear &&
-        Array.isArray(query.academicYear) &&
-        query.academicYear.length == 2 &&
-        query.academicYear[0] > project.academicYear &&
-        query.academicYear[1] < project.academicYear) {
-        return;
+    if (
+      query.academicYear &&
+      Array.isArray(query.academicYear) &&
+      query.academicYear.length == 2 &&
+      query.academicYear[0] > project.academicYear &&
+      query.academicYear[1] < project.academicYear
+    ) {
+      return;
     }
 
     projects.push(project);
@@ -175,6 +177,6 @@ module.exports = db => {
     get: get(db),
     insert: insert(db),
     update: update(db),
-    delete: _delete(db)
+    delete: _delete(db),
   };
 };
