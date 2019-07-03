@@ -40,6 +40,7 @@ const post = async ctx => {
   // TODO: Handle error properly.
   const projects = await ctx.db.projects.all(query);
   ctx.core.setProjects(projects);
+  ctx.core.rotateClients();
 
   ctx.body = { message: "Success!" };
 };
