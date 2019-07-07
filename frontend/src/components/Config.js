@@ -46,21 +46,28 @@ class Config extends Component {
 
   onTagsInputChanged(event) {
     const form = this.state.form;
-    form.tags = event.target.value.split(',').map(tag => tag.trim());
+    form.tags = event.target.value.split(',');
     this.setState({form});
   }
 
   onCourseInputChanged(event) {
     const form = this.state.form;
-    form.course = event.target.value.split(',').map(course => course.trim());
+    form.course = event.target.value.split(',');
     this.setState({form});
   }
 
   onSubmitButtonPressed(event) {
     event.preventDefault();
 
+    const query = {
+      title: this.state.form.title,
+      description: this.state.form.description,
+      tags: this.state.form.tags.map(tag => tag.trim()),
+      course: this.state.form.course.map(course => course.trim()),
+    };
+
     axios
-      .post('/live', this.state.form)
+      .post('/live', query)
       .then(res => res.data)
       .then(console.log)
       .catch(console.error);
