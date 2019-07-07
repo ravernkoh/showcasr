@@ -42,7 +42,7 @@ const post = async ctx => {
   ctx.core.setProjects(projects);
   ctx.core.rotateClients();
 
-  ctx.body = { message: "Success!" };
+  ctx.body = { projectCount: projects.length };
 };
 
 module.exports = (env, router) => {
