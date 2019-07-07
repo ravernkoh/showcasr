@@ -93,21 +93,21 @@ class Display extends Component {
   renderProject() {
     return (
       <div className="Display-project">
-        <img
-          className="Display-project-image"
-          src={this.state.project.image}
-          alt={this.state.project.title}
-        />
+        <div className="Display-project-image">
+          <img src={this.state.project.image} alt={this.state.project.title} />
+        </div>
         {this.state.project.video ? (
-          <YouTube
-            videoId={this.state.project.video}
-            opts={{
-              playerVars: {
-                autoplay: 1,
-                controls: 0,
-              },
-            }}
-          />
+          <div className="Display-project-video">
+            <YouTube
+              videoId={this.state.project.video}
+              opts={{
+                playerVars: {
+                  autoplay: 1,
+                  controls: 0,
+                },
+              }}
+            />
+          </div>
         ) : null}
       </div>
     );

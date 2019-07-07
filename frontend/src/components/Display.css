@@ -1,11 +1,17 @@
 .Display-project {
-  height: 100%;
+  height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
 .Display-project-image {
+  flex-grow: 1;
+  min-height: 1%;
+}
+
+.Display-project-image img {
   height: 100%;
 }
 
