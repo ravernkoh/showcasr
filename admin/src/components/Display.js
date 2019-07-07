@@ -41,6 +41,7 @@ class Display extends Component {
     this.onTagsInputChanged = this.onTagsInputChanged.bind(this);
     this.onCourseInputChanged = this.onCourseInputChanged.bind(this);
     this.onDeleteButtonPressed = this.onDeleteButtonPressed.bind(this);
+    this.onUndoButtonPressed = this.onUndoButtonPressed.bind(this);
     this.onCreateButtonPressed = this.onCreateButtonPressed.bind(this);
 
     this.reloadProjects = this.reloadProjects.bind(this);
@@ -163,6 +164,7 @@ class Display extends Component {
             project.image = project.image.url;
           }
           delete project.action;
+          delete project.previousAction;
           delete project.isExpanded;
           requests.push(axios.post('/projects', project));
           break;
@@ -174,6 +176,7 @@ class Display extends Component {
             project.image = project.image.url;
           }
           delete project.action;
+          delete project.previousAction;
           delete project.isExpanded;
           requests.push(axios.patch(`/projects/${id}`, project));
           break;
@@ -308,7 +311,18 @@ class Display extends Component {
   onDeleteButtonPressed(index) {
     return () => {
       const project = this.state.projects[index];
+      project.previousAction = project.action;
       project.action = ACTION_DELETE;
+      project.isExpanded = false;
+      this.setState({projects: this.state.projects});
+    };
+  }
+
+  onUndoButtonPressed(index) {
+    return () => {
+      const project = this.state.projects[index];
+      project.action = project.previousActin;
+      delete project.previousAction;
       this.setState({projects: this.state.projects});
     };
   }
@@ -365,7 +379,7 @@ class Display extends Component {
     let content;
 
     if (project.action === ACTION_DELETE) {
-      content = this.renderDeleteNote();
+      content = this.renderDeleteNote(index);
     } else if (!project.isExpanded) {
       content = this.renderCollapsedProject(project, index);
     } else {
@@ -481,11 +495,20 @@ class Display extends Component {
     }
   }
 
-  renderDeleteNote() {
+  renderDeleteNote(index) {
     return (
-      <span className="Display-note-delete">
-        Project pending deletion, please save!
-      </span>
+      <>
+        <span className="Display-note-delete">
+          Project pending deletion, please save!
+        </span>
+        <div>
+          <button
+            className="Display-note-undo-button"
+            onClick={this.onUndoButtonPressed(index)}>
+            Undo
+          </button>
+        </div>
+      </>
     );
   }
 
