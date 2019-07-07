@@ -37,6 +37,7 @@ class Display extends Component {
     this.onDescriptionTextareaChanged = this.onDescriptionTextareaChanged.bind(
       this,
     );
+    this.onVideoInputChanged = this.onVideoInputChanged.bind(this);
     this.onImageInputChanged = this.onImageInputChanged.bind(this);
     this.onTagsInputChanged = this.onTagsInputChanged.bind(this);
     this.onCourseInputChanged = this.onCourseInputChanged.bind(this);
@@ -264,6 +265,17 @@ class Display extends Component {
     };
   }
 
+  onVideoInputChanged(index) {
+    return event => {
+      const project = this.state.projects[index];
+      if (!project.action) {
+        project.action = ACTION_UPDATE;
+      }
+      project.video = event.target.value;
+      this.setState({projects: this.state.projects});
+    };
+  }
+
   onImageInputChanged(index) {
     return event => {
       const project = this.state.projects[index];
@@ -451,6 +463,15 @@ class Display extends Component {
               value={project.description}
               onChange={this.onDescriptionTextareaChanged(index)}
               name="description"
+            />
+          </div>
+          <div className="Display-project-form-group">
+            <label htmlFor="video">Video</label>
+            <input
+              type="text"
+              value={project.video}
+              onChange={this.onVideoInputChanged(index)}
+              name="video"
             />
           </div>
           <div className="Display-project-form-group">
