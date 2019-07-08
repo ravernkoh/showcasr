@@ -49,8 +49,6 @@ const removeClient = core => id => {
 
 // Rotates the existing clients and sends their new project to them through the websocket.
 const rotateClients = core => () => {
-  console.log("Rotating clients...");
-
   // Intitial rotation, to bump things around when they are equal.
   if (core.clients.length % core.projects.length === 0) {
     core.projects.rotate();
