@@ -1,5 +1,6 @@
 .dockerignore
 .env.sample
+.env
 .gitignore
 docker-compose*
 Dockerfile*
