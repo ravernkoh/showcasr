@@ -2,6 +2,7 @@
 
 ENV_FILE="$HOME/dev/bin/env"
 URL='showcasr-frontend.ravern.co'
+PID_FILE="/tmp/kiosk.pid"
 
 main() {
     if [ -e "${ENV_FILE}" ]; then
@@ -11,7 +12,8 @@ main() {
         log "DID NOT FIND ENV FILE"
     fi
     check_internet_connection
-    lxterminal -l -e "journalctl -r -u kiosk --boot" &
+    open_ping_terminal
+    open_log_terminal
     disable_screen_saver
     disable_chromium_warnings
     launch_chromium
@@ -33,6 +35,30 @@ check_internet_connection() {
     else
         log "Internet connection available"
     fi
+}
+
+open_ping_terminal() {
+    # if [ -e "${PID_FILE}" ]; then
+        # log "Found PID FILE"
+        # curPID=$(<"$PIDFile")
+
+        # if kill -0 "$curPID"; then 
+            # echo "Terminal Already Running"
+            # return
+        # else
+            # rm -f "${PID_FILE}"
+        # fi
+    # else
+        # log "DID NOT FIND ENV FILE"
+    # fi
+    lxterminal -l -e "ping -i 60 google.com" &
+    # pid=$!
+    # echo "${pid}" > "{PID_FILE}"
+    
+}
+
+open_log_terminal() {
+    lxterminal -l -e "journalctl -r -u kiosk --boot" &
 }
 
 disable_screen_saver() {
