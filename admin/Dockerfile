@@ -1,19 +1,13 @@
-FROM node:11-alpine
-
+FROM node:11-alpine as builder
 WORKDIR /usr/src/app
 
-ARG PORT=80
-ARG NODE_ENV=production
+ENV NODE_ENV production
 
 COPY package*.json ./
-
 RUN yarn
-
 COPY . .
+RUN yarn build
 
-ENV PORT ${PORT}
-ENV NODE_ENV ${NODE_ENV}
-
-EXPOSE ${PORT}
-
-CMD ["yarn", "start"]
+FROM nginx:alpine
+COPY --from=builder /usr/src/app/build /usr/share/nginx/html
+EXPOSE 80
