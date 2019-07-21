@@ -2,7 +2,9 @@
 
 ENV_FILE="$HOME/dev/bin/env"
 URL='showcasr-frontend.ravern.co'
-PID_FILE="/tmp/kiosk.pid"
+#PID_FILE="/tmp/kiosk.pid"
+
+KILL_CHROME_FLAG=0
 
 main() {
     if [ -e "${ENV_FILE}" ]; then
@@ -17,12 +19,21 @@ main() {
     disable_screen_saver
     disable_chromium_warnings
     launch_chromium
-    if [ -n "${USERNAME}" -a -n "${PASSWORD}" -a -n "${URL}" ]; then
-        sleep 30
-        do_login
-    fi
 
-    while true; do sleep 10; done # Leave the program running
+    while true; do
+        if ping -c1 google.com >/dev/null 2>&1; then
+            KILL_CHROME_FLAG=0
+        else
+            KILL_CHROME_FLAG=1
+        fi
+
+        if [ $KILL_CHROME_FLAG = 0 ]; then
+            # Check if chrome already running if not
+            launch_chromium
+        else
+            killall chromium-browser-v7
+        fi
+    done
 
 }
 
@@ -39,22 +50,22 @@ check_internet_connection() {
 
 open_ping_terminal() {
     # if [ -e "${PID_FILE}" ]; then
-        # log "Found PID FILE"
-        # curPID=$(<"$PIDFile")
+    # log "Found PID FILE"
+    # curPID=$(<"$PIDFile")
 
-        # if kill -0 "$curPID"; then 
-            # echo "Terminal Already Running"
-            # return
-        # else
-            # rm -f "${PID_FILE}"
-        # fi
+    # if kill -0 "$curPID"; then
+    # echo "Terminal Already Running"
+    # return
     # else
-        # log "DID NOT FIND ENV FILE"
+    # rm -f "${PID_FILE}"
+    # fi
+    # else
+    # log "DID NOT FIND ENV FILE"
     # fi
     lxterminal -l -e "ping -i 60 google.com" &
     # pid=$!
     # echo "${pid}" > "{PID_FILE}"
-    
+
 }
 
 open_log_terminal() {
@@ -86,6 +97,11 @@ launch_chromium() {
     while ! pgrep chromium; do
         sleep 5
     done
+
+    if [ -n "${USERNAME}" -a -n "${PASSWORD}" -a -n "${URL}" ]; then
+        sleep 30
+        do_login
+    fi
 }
 
 do_login() {
