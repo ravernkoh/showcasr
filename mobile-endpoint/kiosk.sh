@@ -22,17 +22,24 @@ main() {
 
     while true; do
         if ping -c1 google.com >/dev/null 2>&1; then
+            log "Set Kill Chrome flag to 0"
             KILL_CHROME_FLAG=0
         else
+            log "Set Kill Chrome flag to 1"
             KILL_CHROME_FLAG=1
         fi
 
         if [ $KILL_CHROME_FLAG = 0 ]; then
             # Check if chrome already running if not
-            launch_chromium
+            if ! pgrep chromium >/dev/null 2>&1; then
+                launch_chromium
+            fi
         else
-            killall chromium-browser-v7
+            if pgrep chromium >/dev/null 2>&1; then
+                killall chromium-browser-v7
+            fi
         fi
+        sleep 5
     done
 
 }
@@ -69,7 +76,7 @@ open_ping_terminal() {
 }
 
 open_log_terminal() {
-    lxterminal -l -e "journalctl -r -u kiosk --boot" &
+    lxterminal -l -e "journalctl -f -u kiosk --boot" &
 }
 
 disable_screen_saver() {
@@ -94,9 +101,6 @@ disable_chromium_warnings() {
 launch_chromium() {
     log "Launching chromium"
     /usr/bin/chromium-browser --noerrdialogs --disable-infobars --kiosk "${URL}" >/dev/null 2>&1 &
-    while ! pgrep chromium; do
-        sleep 5
-    done
 
     if [ -n "${USERNAME}" -a -n "${PASSWORD}" -a -n "${URL}" ]; then
         sleep 30
