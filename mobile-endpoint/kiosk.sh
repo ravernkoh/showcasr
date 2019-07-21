@@ -22,10 +22,9 @@ main() {
 
     while true; do
         if ping -c1 google.com >/dev/null 2>&1; then
-            log "Set Kill Chrome flag to 0"
             KILL_CHROME_FLAG=0
         else
-            log "Set Kill Chrome flag to 1"
+            log "Check Internet connectivity"
             KILL_CHROME_FLAG=1
         fi
 
