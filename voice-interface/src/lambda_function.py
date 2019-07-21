@@ -29,7 +29,7 @@ EXCEPTION_MESSAGE = "Sorry. I cannot help you with that."
 
 LAUNCH_MESSAGE = "Welcome to showcaser."
 GOODBYE_MESSAGE = "Alright! Goodbye!"
-REQUEST_COURSE_MESSAGE = "What courses do you want?"
+REQUEST_COURSE_MESSAGE = "Which course do you want?"
 REQUEST_TAG_MESSAGE = "What type of projects are you looking for?"
 HELP_COURSE_MESSAGE = "There is IMGD, IT, FI, ISF, and A3DA."
 HELP_TAG_MESSAGE = "There are projects ranging from programming, to design."
@@ -78,66 +78,7 @@ def LaunchHandler(handler_input):
     session['course'] = None
     session['exiting'] = False
 
-    '''
-    if not handler_input.attributes_manager.persistent_attributes:
-        session['projectCount'] = 0
-    else:
-        session['projectCount'] = handler_input.attributes_manager.persistent_attributes['projectCount']
-    '''
     return elicit_slot("ProjectType", "RetrieveProjectsIntent", handler_input, REQUEST_TAG_MESSAGE, LAUNCH_MESSAGE)
-
-'''
-@sb.request_handler(can_handle_func = lambda x: (is_intent_name("RetrieveProjectsIntent")(x) and (x.request_envelope.request.dialog_state == DialogState.STARTED or x.request_envelope.request.dialog_state == DialogState.IN_PROGRESS) and x.request_envelope.request.intent.slots['CourseType'].value is None))
-def RetrieveProjectsHandler(handler_input):
-    """Handler to request course after project type is given"""
-    attr = handler_input.attributes_manager.session_attributes
-    current_intent = handler_input.request_envelope.request.intent
-    slots = current_intent.slots
-    hasProject = slots['ProjectType'].value is not None
-    if hasProject:
-        attr['isRetrieving'] = True
-        value = slots['ProjectType'].value
-        res = "From which course?"
-
-        return handler_input.response_builder.speak(
-                            res).add_directive(
-                            ElicitSlotDirective(updated_intent=current_intent,slot_to_elicit="CourseType")
-                        ).response
-    else:
-        attr['isRetrieving'] = True 
-        return handler_input.response_builder.speak(
-                            "What type of projects are you looking for!").add_directive(
-                            ElicitSlotDirective(slot_to_elicit="ProjectType")
-                        ).response
-
-@sb.request_handler(can_handle_func = lambda x: is_intent_name("RetrieveProjectsIntent")(x) and x.request_envelope.request.intent.slots['ProjectType'].value is not None and x.request_envelope.request.intent.slots['CourseType'].value is not None)
-def GetCourseProjectsHandler(handler_input):
-    """ Handler to retrieve project with given course and project """
-    cur_intent = handler_input.request_envelope.request.intent
-    attr = handler_input.attributes_manager.session_attributes
-    resolutions = cur_intent.slots['CourseType'].resolutions.resolutions_per_authority
-    course = resolutions[0].values[0].value.name
-    tag = cur_intent.slots['ProjectType'].value
-    res = f'Here are {tag} projects from the {course} course. '
-    project_count = 0
-
-    response = requests.post("https://showcasr-backend.ravern.co/live", json=GeneratePayload(tag, course), headers=FormHeader(attr['idToken']))
-    if response.status_code == 401:
-        return handler_input.response_builder.speak("Request Error! Unauthorized").response
-    else:
-        json = response.json()
-        project_count = json['projectCount']
-    if project_count == 0:
-        res = f"There are no projects regarding {tag} from the {course} course"
-    else:
-        res += f'There are a total of {project_count} projects' 
-        attr['projectCount'] = project_count
-        handler_input.attributes_manager.persistent_attributes['projectCount'] = attr['projectCount']
-        handler_input.attributes_manager.save_persistent_attributes()
-
-    attr['isRetrieving'] = False
-    return handler_input.response_builder.speak(res).set_should_end_session(False).response
-'''
 
 def get_resolved_value(slot):
     if slot is None:
@@ -169,12 +110,12 @@ def GetTypeHandler(handler_input):
 
     if tag.value is None:
         return handler_input.response_builder.speak(
-                            "What type of projects do you want?").add_directive(
+                            "Sorry I did not get that. What type of projects do you want?").add_directive(
                             ElicitSlotDirective(slot_to_elicit="ProjectType")
                         ).response
     else:
         session['tag'] = tag.value
-        return ProjectHandler(handler_input)
+        return ProjectHandler(handler_input, "")
         
 @sb.request_handler(can_handle_func = is_intent_name("GetCourseIntent"))
 def GetCourseHandler(handler_input):
@@ -189,18 +130,18 @@ def GetCourseHandler(handler_input):
     else:
         value = get_resolved_value(course_slot)
         session['course'] = value
-        return ProjectHandler(handler_input)
+        return ProjectHandler(handler_input, "")
     
-def ProjectHandler(handler_input):
+def ProjectHandler(handler_input, suffix):
     session = get_session(handler_input)
     tag, course = session['tag'], session['course']
     status = get_course_and_tag_status(handler_input)
     if status == NO_TAG_NO_COURSE:
-        return handler_input.response_builder.speak("Which course?").add_directive(
-                    ElicitSlotDirective(updated_intent=Intent(name="GetCourseIntent"),slot_to_elicit="CourseType")
+        return handler_input.response_builder.speak(f"{suffix}So, what kind of projects do you want?").add_directive(
+                    ElicitSlotDirective(updated_intent=Intent(name="RetrieveProjectsIntent"),slot_to_elicit="ProjectType")
                 ).response
     if status == HAS_TAG_NO_COURSE:
-        message = "Okay, from which course?"
+        message = f"{suffix}So, from which course do you want {tag} projects from?"
         return handler_input.response_builder.speak(
                     message).add_directive(
                     ElicitSlotDirective(updated_intent=Intent(name="GetCourseIntent"),slot_to_elicit="CourseType")
@@ -209,21 +150,25 @@ def ProjectHandler(handler_input):
         message = "Okay, what kind of projects do you want?"
     elif status == HAS_TAG_HAS_COURSE:
         message = ""
-        response = requests.post("https://showcasr-backend.ravern.co/live", json=GeneratePayload(tag, course), headers=FormHeader(session['idToken']))
+        response = requests.post("https://backend.showcasr.yadunut.com/live", json=GeneratePayload(tag, course), headers=FormHeader(session['idToken']))
         if response.status_code == 401:
             message = "Request Error! Unauthorized"
         else:
+            session['tag'] = None
+            session['course'] = None
             json = response.json()
             project_count = json['projectCount']
             if project_count == 0:
                 message = f"{tag} projects from the {course} course was not found."
                 return elicit_slot("ProjectType", "RetrieveProjectsIntent", handler_input, REQUEST_TAG_MESSAGE, message)
             else:
-                message = f'Here are {tag} projects from the {course} course. There is a total of {project_count} project'
+                if "all" in course:
+                    message = f'Here are {tag} projects from all of the courses. There is a total of {project_count} project'
+                else:
+                    message = f'Here are {tag} projects from the {course} course. There is a total of {project_count} project'
                 if project_count > 1:
                     message += "s"
-        session['tag'] = None
-        session['course'] = None
+
 
     return handler_input.response_builder.speak(message).set_should_end_session(False).response
 
@@ -244,6 +189,25 @@ def get_course_and_tag_status(handler_input):
     elif tag is None and course is None:
         return NO_TAG_NO_COURSE
 
+@sb.request_handler(can_handle_func = is_intent_name("CourseOnlyIntent"))
+def GetCourseOnlyHandler(handler_input):
+    session = get_session(handler_input)
+    course = get_resolved_value(get_slot(handler_input, "Course"))
+    response = requests.post("https://backend.showcasr.yadunut.com/live", json=GeneratePayload("", course), headers=FormHeader(session['idToken']))
+    message = ""
+    if response.status_code == 401:
+        message = "Request Error! Unauthorized"
+    else:
+        json = response.json()
+        project_count = json['projectCount']
+        if project_count == 0:
+            message = f"Projects from the {course} course was not found."
+        else:
+            message = f'Here are all projects from the {course} course. There is a total of {project_count} project'
+            if project_count > 1:
+                message += "s"
+    return handler_input.response_builder.speak(message).set_should_end_session(False).response
+
 @sb.request_handler(can_handle_func = is_intent_name("DisplayCountIntent"))
 def GetDisplayCountHandler(handler_input):
     attr = handler_input.attributes_manager.session_attributes
@@ -263,6 +227,23 @@ def StopHandler(handler_input):
         session['tag'] = None
         return handler_input.response_builder.speak("Retrieving cancelled. What kind of projects would you like?").set_should_end_session(False).response
 
+@sb.request_handler(can_handle_func = is_intent_name("SpecificCourseHelp"))
+def CourseHelpHandler(handler_input):
+    course = get_resolved_value(get_slot(handler_input, "Course"))
+    message = ""
+    if course == "ISF":
+        message = "i. s. f. is about cybersecurity. "
+    elif course == "FI":
+        message = "f. i. is about finance. "
+    elif course == "IT":
+        message = "i. t. is about programming. "
+    elif course == "A3DA":
+        message = "a. three. d. a. is about animation. "
+    elif course == "IMGD":
+        message = "i. m. g. d. is about game design. "
+    return ProjectHandler(handler_input, message)
+
+
 @sb.request_handler(can_handle_func = is_intent_name("AMAZON.HelpIntent"))
 def HelpIntentHandler(handler_input):
     """Handler for Help Intent."""
@@ -270,11 +251,10 @@ def HelpIntentHandler(handler_input):
     tag, course = session['tag'], session['course']
     status = get_course_and_tag_status(handler_input)
     if status == HAS_TAG_NO_COURSE:
-        return handler_input.response_builder.speak("There is IMGD, IT, FI, ISF, and A3DA. Which course would you like?").set_should_end_session(False).response
+        return elicit_slot("CourseType", "GetCourseIntent", handler_input, REQUEST_COURSE_MESSAGE, "There is IMGD, IT, FI, ISF, and A3DA.")
     else:
-        return handler_input.response_builder.speak("There are projects ranging from programming, to design. What kind of projects would you like?").add_directive(
-            ElicitSlotDirective(updated_intent=Intent(name="GetCourseIntent"),slot_to_elicit="CourseType")
-        ).response 
+        return elicit_slot("ProjectType", "RetrieveProjectsIntent", handler_input, REQUEST_TAG_MESSAGE, "There are projects ranging from programming to design.")
+        
 
 @sb.request_handler(can_handle_func = is_intent_name("AMAZON.FallbackIntent"))
 def FallbackIntentHandler(handler_input):
@@ -287,10 +267,10 @@ def FallbackIntentHandler(handler_input):
     session = get_session(handler_input)
     status = get_course_and_tag_status(handler_input)
     if status == HAS_TAG_NO_COURSE:
-        return handler_input.response_builder.speak("I did not get that. Which course would you like?").set_should_end_session(False).response
+        return elicit_slot("CourseType", "GetCourseIntent", handler_input, REQUEST_COURSE_MESSAGE, "I did not get that.")
     else:
         return handler_input.response_builder.speak("I did not get that. What kind of projects would you like?").add_directive(
-            ElicitSlotDirective(updated_intent=Intent(name="GetCourseIntent"),slot_to_elicit="CourseType")
+            ElicitSlotDirective(updated_intent=Intent(name="RetrieveProjectsIntent"),slot_to_elicit="ProjectType")
         ).response
 
 @sb.request_handler(can_handle_func = is_request_type("SessionEndedRequest"))
@@ -316,15 +296,13 @@ def CatchAllExceptionHandler(handler_input, exception):
 
     handler_input.response_builder.speak(EXCEPTION_MESSAGE)
 
-    return handler_input.response_builder.response
+    return handler_input.response_builder.speak(exception).response
 
 
 @sb.global_response_interceptor()
-def ResponseLogger(handler_input):
+def ResponseLogger(handler_input, response):
     """Log the alexa responses."""
-    def process(self, handler_input, response):
-        # type: (HandlerInput, Response) -> None
-        logger.debug("Alexa Response: {}".format(response))
+    logger.debug("Alexa Response: {}".format(response))
 
 @sb.global_request_interceptor()
 def request_logger(handler_input):
