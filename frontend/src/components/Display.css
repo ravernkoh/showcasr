@@ -5,6 +5,10 @@
   align-items: center;
 }
 
+.Display-project img {
+  margin-right: 20px;
+}
+
 .Display-project-image {
   height: 100%;
 }
