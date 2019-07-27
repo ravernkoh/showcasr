@@ -1,14 +1,16 @@
+# /etc/systemd/system/kiosk.service
 [Unit]
-Description=Chromium Kiosk
-Wants=graphical.target
-After=graphical.target
+Description=Capstone Kiosk
+Requires=graphical.target network-online.target
+After=graphical.target network-online.target
+StartLimitIntervalSec=0
 
 [Service]
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/pi/.Xauthority
 Type=simple
 ExecStart=/bin/bash /home/pi/dev/bin/kiosk.sh
-Restart=on-abort
+Restart=on-failure
 User=pi
 Group=pi
 
