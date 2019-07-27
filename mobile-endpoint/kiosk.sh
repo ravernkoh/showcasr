@@ -35,7 +35,7 @@ main() {
             fi
         else
             if pgrep chromium >/dev/null 2>&1; then
-                killall chromium-browser-v7
+                killall chromium-browser-v7 || true
             fi
         fi
         sleep 5
