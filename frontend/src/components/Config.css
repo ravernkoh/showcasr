@@ -13,18 +13,23 @@
 }
 
 .Config-toggle-button {
-  background-color: grey;
-  color: white;
+  color: #87458b;
   padding: 10px;
   border-radius: 5px;
-  border-width: 0;
+  border: 2px solid #87458b;
+  transition: 0.3s;
+}
+
+.Config-toggle-button:hover {
+  background-color: #87458b;
+  color: white;
 }
 
 .Config-main-expanded {
-  background-color: #eee;
+  background-color: white;
   width: 480px;
   margin-bottom: 5px;
-  border: solid 1px #ddd;
+  border: solid 2px #87458b;
   border-radius: 5px;
   padding: 10px;
 }
@@ -54,14 +59,25 @@
   flex-grow: 1;
   padding: 5px;
   border-radius: 3px;
-  border-width: 1px;
+  border: 2px solid #87458b;
 }
 
 .Config-form-submit-button {
+  color: #87458b;
   margin-top: 10px;
-  background-color: #16db29;
-  color: white;
   padding: 10px;
   border-radius: 5px;
-  border-width: 0;
+  border: 2px solid #87458b;
+  transition: 0.3s;
+}
+
+.Config-form-submit-button:hover {
+  background-color: #87458b;
+  color: white;
+}
+
+.Config-form-submit-button:active {
+  color: #87458b;
+  background-color: white;
+  transition: 0s;
 }

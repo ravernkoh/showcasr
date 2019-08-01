@@ -13,6 +13,14 @@ code {
     monospace;
 }
 
+button {
+  outline: none;
+}
+
+input {
+  outline: none;
+}
+
 #root {
   height: 100%;
 }
