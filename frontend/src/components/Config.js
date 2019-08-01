@@ -62,8 +62,12 @@ class Config extends Component {
     const query = {
       title: this.state.form.title,
       description: this.state.form.description,
-      tags: this.state.form.tags.map(tag => tag.trim()),
-      course: this.state.form.course.map(course => course.trim()),
+      tags: this.state.form.tags
+        .map(tag => tag.trim())
+        .filter(tag => tag !== ''),
+      course: this.state.form.course
+        .map(course => course.trim())
+        .filter(course => course !== ''),
     };
 
     axios

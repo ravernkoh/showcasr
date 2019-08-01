@@ -39,10 +39,11 @@ const post = async ctx => {
 
   // TODO: Handle error properly.
   const projects = await ctx.db.projects.all(query);
+  const projectCount = projects.length;
   ctx.core.setProjects(projects);
   ctx.core.rotateClients();
 
-  ctx.body = { projectCount: projects.length };
+  ctx.body = { projectCount };
 };
 
 module.exports = (env, router) => {

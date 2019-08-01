@@ -14,8 +14,6 @@ const main = async env => {
   app.context.db = db;
   app.context.core = core({ interval: env.REFRESH_INTERVAL });
 
-  console.log(env);
-
   app.context.core.startDisplay();
 
   koa(env, app);
