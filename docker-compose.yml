@@ -1,0 +1,65 @@
+version: '3'
+
+services:
+  backend:
+    restart: always
+    image: showcasr/backend:0.0.5
+    env_file:
+      - ./backend.env
+    volumes: 
+      - ./serviceAccountKey.json:/usr/src/app/serviceAccountKey.json
+    environment:
+      - VIRTUAL_HOST=backend.site.com
+      - LETSENCRYPT_HOST=backend.site.com
+      - HTTPS_METHOD=noredirect
+  
+  frontend:
+    restart: always
+    image: showcasr/frontend:0.0.6
+    env_file:
+      - ./frontend.env
+    environment:
+      - VIRTUAL_HOST=site.com
+      - LETSENCRYPT_HOST=site.com
+
+  admin:
+    restart: always
+    image: showcasr/admin:0.0.4
+    env_file:
+      - ./frontend.env
+    environment:
+      - VIRTUAL_HOST=admin.site.com
+      - LETSENCRYPT_HOST=admin.site.cosite.com
+  
+  nginx-proxy:
+    restart: always
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+
+  nginx-proxy-companion:
+    restart: always
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes: 
+      - certs:/etc/nginx/certs:rw
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  conf:
+  vhost:
+  html:
+  dhparam:
+  certs:
