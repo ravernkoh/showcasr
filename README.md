@@ -1,3 +1,3 @@
-# Showcasr
+# Showcase
 
 Capstone project for Semester 1 2019.
